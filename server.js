@@ -14,7 +14,10 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "*", // allow all (for now)
+  credentials: true
+}));
 app.use(express.json());
 
 // Make uploads folder static
