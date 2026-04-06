@@ -45,7 +45,7 @@ export const createPost = async (req, res) => {
   }
 
   try {
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    const image = req.file ? req.file.path : null;
     const post = await Post.create({
       title,
       description,

@@ -1,38 +1,35 @@
 import multer from "multer";
-import path from "path";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename(req, file, cb) {
-    cb(
-      null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-    );
-  }
+// 🔐 Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-function checkFileType(file, cb) {
-  const extname = /jpg|jpeg|png/.test(
-    path.extname(file.originalname).toLowerCase()
-  );
+// ☁️ Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "school_posts", // folder in cloudinary
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      transformation: [
+        { width: 800, height: 600, crop: "limit" }, // resize
+        { quality: "auto" }, // optimize quality
+      ],
+    };
+  },
+});
 
-  const mimetype = /image\/(jpeg|jpg|png)/.test(file.mimetype);
-
-  if (extname && mimetype) {
-    cb(null, true);
-  } else {
-    cb(new Error("Images only (jpg, jpeg, png)!"));
-  }
-}
-
+// 📤 Upload middleware
 const upload = multer({
   storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 🔥 2MB limit
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  }
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB
+  },
 });
 
 export default upload;
