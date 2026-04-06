@@ -7,11 +7,11 @@ import upload from "../middleware/uploadMiddleware.js";
 const router = express.Router();
 
 router.route('/')
-  .get(protect, getPosts)
+  .get(getPosts)
   .post(protect, upload.single('image'), createPost);
 
 router.route('/:id')
-  .get(protect, getOnePost)
+  .get(getOnePost)
   .delete(protect, deletePost);
 
 export default router;
