@@ -4,7 +4,10 @@ import Student from '../models/Student.js';
 // Get all students
 export const getStudents = async (req, res) => {
   try {
-    const students = await Student.find().populate("class", "className");
+    const students = await Student.find()
+      .select("fullName fatherName feeStatus feePaidDate class")
+      .populate("class", "className")
+      .lean();
 
     res.json(students);
   } catch (error) {
@@ -17,7 +20,10 @@ export const getStudents = async (req, res) => {
 export const getOneStudent = async (req, res) => {
   const {id} = req.params
   try {
-    const student = await Student.findById(id).populate("class", "className");
+    const student = await Student.findById(id)
+    .populate("class", "className")
+    .lean();
+
     if (!student) {
       return res.status(400).json({
         message:"Student not found"
@@ -50,7 +56,7 @@ export const addStudent = async (req, res) => {
       feeStatus = "not paid"
     }
 
-    const existingClass = await Class.findById(classId);
+    const existingClass = await Class.findById(classId).lean();
     if (!existingClass) {
       return res.status(404).json({
         message: "Class not found"
@@ -83,18 +89,18 @@ export const updateStudent = async (req, res) => {
       feeStatus = null;
     }
 
-    // ✅ Validate required fields
+    // Validate required fields
     if (!fullName || !fatherName) {
       return res.status(400).json({
         message: "Full name and father name are required",
       });
     }
 
-    // ✅ Handle class
+    // Handle class
     if (!classId) {
       classId = null;
     } else {
-      const existingClass = await Class.findById(classId);
+      const existingClass = await Class.findById(classId).lean();
       if (!existingClass) {
         return res.status(404).json({
           message: "Class not found",

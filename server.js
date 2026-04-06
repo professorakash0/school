@@ -7,6 +7,9 @@ import studentRoutes from "./routes/studentRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
 import classRoutes from "./routes/classRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import compression from "compression";
+
+
 
 // Connect to database
 connectDB();
@@ -20,6 +23,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(compression());
 
 // Make uploads folder static
 app.use('/uploads', express.static('uploads'));
